@@ -8755,7 +8755,7 @@ SDValue TargetLowering::expandIS_FPCLASS(EVT ResultVT, SDValue Op,
       ISD::CondCode OrderedOp = IsInverted ? ISD::SETUGE : ISD::SETOLT;
       ISD::CondCode UnorderedOp = IsInverted ? ISD::SETOGE : ISD::SETULT;
 
-      if (isCondCodeLegalOrCustom(IsOrdered ? OrderedOp : UnorderedOp,
+      if (isCondCodeLegalOrCustom(UnorderedOp,
                                   OperandVT.getScalarType().getSimpleVT())) {
         // (issubnormal(x) || iszero(x)) --> fabs(x) < smallest_normal
 
