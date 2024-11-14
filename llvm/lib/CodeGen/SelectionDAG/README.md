@@ -2,7 +2,7 @@
 
 ## Basic Binary Arithmetic Operators
 
-+ https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/include/llvm/CodeGen/ISDOpcodes.h#L245-L252
+* https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/include/llvm/CodeGen/ISDOpcodes.h#L245-L252
 
 * visitADD 
 
