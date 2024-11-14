@@ -10,15 +10,74 @@
 
         + Combine `a+b` to `a|b` if a and b share no bits.
 
+        + Basic Algebraic optimizations and canonicalizations like
+
+            - Folds `(add x, undef) -> undef`
+
+            - Folds `(add c1, c2) -> c1+c2`
+
+            - Canonicalize constant to RHS
+
+            - Folds `(add x, 0) -> x`
+
+            - (add step_vector(c1), step_vector(c2)  to step_vector(c1+c2))
+
+            - More combines in `visitAddLike`
+
 * visitSUB 
+
+    - Cases
+
+        + Folds `(sub x, x) -> 0`
+
+        + Folds `(sub c1, c2) -> c3`
+
+        + Folds `fold (sub x, c) -> (add x, -c)`
+
+        + Canonicalize (sub -1, x) -> ~x, i.e. (xor x, -1)
+
+        + Tries to replace `sub` with `add` wherever possible for more folding potential
 
 * visitMUL 
 
+    - Cases
+
+        + Folds `(mul x, undef) -> 0`
+
+        + Folds `(mul c1, c2) -> c1*c2`
+
+        + Canonicalize constants to RHS
+
+        + Folds `(mul x, (1 << c)) -> x << c`
+
+
 * visitSDIV 
+
+    - Cases
+
+        + Constant folding
+
+        + Strength reduces to UDIV is sign bit in both operands are zero
+
+        + If the corresponding remainder node exists, update its users with `Dividend - (Quotient * Divisor)`.
 
 * visitUDIV 
 
+    - Cases 
+
+        + Constant folding
+
+        + Folds `(udiv X, -1) -> select(X == -1, 1, 0)`
+
+        + If the corresponding remainder node exists, update its users with `Dividend - (Quotient * Divisor)`.
+
 * visitREM
+
+    - Cases
+
+        + Constant folding
+
+        + If we know the sign bits of both operands are zero, strength reduce to a `urem` instead
 
 ## Saturated Operators
 
