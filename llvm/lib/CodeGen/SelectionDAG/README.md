@@ -79,13 +79,24 @@
 
         + If we know the sign bits of both operands are zero, strength reduce to a `urem` instead
 
+* Note: Most of the vector patterns for these ops are simplified in `SimplifyVBinOp`
+
 ## Saturated Operators
 
 + https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/include/llvm/CodeGen/ISDOpcodes.h#L341-L348
 
 * visitADDSAT 
-
 * visitSUBSAT 
+
+    - Cases 
+
+        + Strength reduction to `add`/`sub` if operands will not overflow
+
+        + Constant folding
+
+        + Canonicalization of constant to RHS
+
+        + Basic algebraic optimizations
 
 ## Double Precision Multiplication
 
@@ -95,6 +106,10 @@
 
 * visitUMUL_LOHI 
 
+    - Cases
+
+        + If the type is twice as wide is legal, transform the `mulhu` to a wider multiply plus a shift.
+
 ## Double Precision Multiplication with truncation
 
 + https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/include/llvm/CodeGen/ISDOpcodes.h#L671-675
@@ -102,6 +117,10 @@
 * visitMULHU 
 
 * visitMULHS 
+
+    - Cases
+
+        + If the type twice as wide is legal, transform the `mulhu` to a wider multiply plus a shift.
 
 ## Add/Sub with Carry
 
@@ -111,17 +130,33 @@
 
 * visitSUBC
 
+    - Cases
+
+        + If the flag result is dead, turn this into an `ADD`/`SUB`.
+
+        + If it cannot overflow, transform into an `add`.
+
 ## Averaging Add
 
 + https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/include/llvm/CodeGen/ISDOpcodes.h#L677-L686
 
 * visitAVG 
 
+    - Cases
+
+        + Folds `avgfloor((add nw x,y), 1) -> avgceil(x,y)`
+        
+        + Folds `avgfloor((add nw x,1), y) -> avgceil(x,y)`
+
 ## Absolute Difference
 
 + https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/include/llvm/CodeGen/ISDOpcodes.h#L688-L693
 
 * visitABD 
+
+    - Cases
+
+        + Folds `(abds x, y) -> (abdu x, y)` if both args are known positive
 
 ## Overflow-aware Arithemtic Operators
 
@@ -133,13 +168,25 @@
 
 * visitMULO  
 
-## Arbitrary Large Addition Subtractions Operators
+    - Cases
+        
+        + If the flag result is dead, turn this into the corresponding operation.
+
+        + fold (saddo (xor a, -1), 1) -> (ssub 0, a)
+
+        + `(mulo x, 2) -> (addo x, x) // FIXME: This needs a freeze.`
+
+## Operators For Arbitrary Large Addition Subtractions
 
 + https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/include/llvm/CodeGen/ISDOpcodes.h#L279-L287
 
 * visitADDE
 
 * visitSUBE
+
+    - Cases 
+    
+        + Folds `(Ope x, y, false) -> (Opc x, y)`
 
 ## Overflow-aware Arithemtic Operators with Carry
 
@@ -153,11 +200,25 @@
 
 * visitSSUBO_CARRY
 
+    - Cases
+
+        + Folds `(op_carry x, y, false) -> (op x, y)`
+
+    - `combineUADDO_CARRYDiamond`
+
+        + https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp:#L3441-L3462
+
 ## Fixed point multiplication
 
 + https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/include/llvm/CodeGen/ISDOpcodes.h#L369-L381
 
 * visitMULFIX 
+
+## 
+
++ https://github.com/abhishek-kaushik22/llvm-project/blob/CGOfficeHours/llvm/include/llvm/CodeGen/ISDOpcodes.h:#L695-700
+
+* visitIMINMAX 
 
 ## Misc.
 
@@ -174,5 +235,3 @@
 * visitSDIVLike 
 
 * visitUDIVLike 
-
-* visitIMINMAX 
