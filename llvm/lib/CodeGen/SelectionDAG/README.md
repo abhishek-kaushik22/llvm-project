@@ -6,9 +6,9 @@
 
 * visitADD 
 
-- Cases
+    - Cases
 
-+ Combine `a+b` to `a|b` if a and b share no bits.
+        + Combine `a+b` to `a|b` if a and b share no bits.
 
 * visitSUB 
 
