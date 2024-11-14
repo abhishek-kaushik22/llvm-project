@@ -220,6 +220,10 @@
 
 * visitIMINMAX 
 
+    - Cases
+
+        + Folds `min/max(vecreduce(x), vecreduce(y)) -> vecreduce(min/max(x, y))`
+
 ## Misc.
 
 * visitADDLike 
